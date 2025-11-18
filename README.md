@@ -53,8 +53,8 @@ Finally, we want our **per capita WIC usage rate**, (defined as WIC participants
 
 ````sql
 select wic.county_of_residence, sum(wic.participants) as total, cali.population, 
-CAST(sum(wic.participants) as DECIMAL) / cali.population as ratio
+CAST(sum(wic.participants) as DECIMAL) / cali.population * 100 as rate
 from wic left join cali on wic.county_of_residence = cali.county
 where wic.county_of_residence <> 'Statewide' and year_month = 2024
-group by wic.county_of_residence, cali.population order by ratio desc;
+group by wic.county_of_residence, cali.population order by rate desc;
 ````
