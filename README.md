@@ -49,7 +49,7 @@ Our question primarily involves WIC data, so we will **use the WIC table as our 
 
 However, we still want to display our aggregate participant values, so we include a **sum(participants)** aggregate function within the 'Select' command. We have to incorporate a 'group by' command now that we've used an aggregate command, so we will first be **grouping by county**. Then we want to have **county population** as a point of comparison, so we will include that as our second 'group by' column. 
 
-Finally, we want our **per capita WIC usage ratio**, (defined as WIC participants / county population), so we include a CAST function to ensure that when we divide our two integer columns, we get the corresponding ratio, and not a result of '0.'
+Finally, we want our **per capita WIC usage rate**, (defined as WIC participants / county population), so we include a CAST function to ensure that when we divide our two integer columns, we get the corresponding ratio, and not a result of '0.'
 
 ````sql
 select wic.county_of_residence, sum(wic.participants) as total, cali.population, 
