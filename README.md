@@ -43,7 +43,7 @@ create table cali(population int, density int, county text);
 ````
 We are importing an extremely simple table, so our table command reflect only three columns. While we don't need population density (population / sq miles), it is interesting to have in our back pocket.
 
-## Joining Both Tables and Sorting by Ratio
+## Joining Both Tables and Sorting by WIC Usage Rate
 
 Our question primarily involves WIC data, so we will **use the WIC table as our primary table**. We are doing a **left join** on the California County Population table, using county name as the join key. 
 
@@ -55,6 +55,6 @@ Finally, we want our **per capita WIC usage rate**, (defined as WIC participants
 select wic.county_of_residence, sum(wic.participants) as total, cali.population, 
 CAST(sum(wic.participants) as DECIMAL) / cali.population as ratio
 from wic left join cali on wic.county_of_residence = cali.county
-where wic.county_of_residence <> 'Statewide' and 
-year_month = 2024 group by wic.county_of_residence, cali.population order by ratio desc;
+where wic.county_of_residence <> 'Statewide' and year_month = 2024
+group by wic.county_of_residence, cali.population order by ratio desc;
 ````
