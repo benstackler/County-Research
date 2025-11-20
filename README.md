@@ -14,6 +14,9 @@ year_month text, race text, participants int);
 ````
 Importantly, we want to ensure that our WIC table variable are correct before importing the WIC data. I imported year_month as text because we already have aggregated year rows, so we don't actually need to convert it to a date format (saving us time). The rest of the columns can be formatted in either integer or text format.
 
+### Raw WIC Data
+![raw](https://github.com/benstackler/County-Research/blob/benstackler-images/Screen%20Shot%202025-11-18%20at%203.31.43%20PM.png)
+
 However, we quickly notice that **some of our participant data is null** for certain rows. This is because the table is broken down by race/ethncitiy and certain counties have 0 participants classified as a certain race/ethnicity. We fix this by updating the table to convert null values to 0.
 
 ````sql
@@ -32,6 +35,9 @@ group by county_of_residence order by total desc;
 ````
 Here we are ensuring that we're **only querying for 2024 data**, and that we're excluding rows where the counties are combined into a nationwide measurement. We want to **sum participants** so that all race metrics are summed, and we **group at the county level** to ensure that our results are listed by county. 
 
+### California Counties WIC Usage
+![WIC Usage](https://github.com/benstackler/County-Research/blob/benstackler-images/Screen%20Shot%202025-11-18%20at%203.32.08%20PM.png)
+
 Unsuprisingly, Los Angeles has the **total most WIC participants** (as it has the highest total population of any county). But this begs the question: Which county has the **highest WIC usage ratio per capita**? Los Angeles' ratio could be expected to be lower than other counties because it has such a large population, and includes certain neighborhoods which are among the wealthiest in the nation.
 
 To find out, we must incorporate **total county population data.**
@@ -42,6 +48,9 @@ To find out, we must incorporate **total county population data.**
 create table cali(population int, density int, county text);
 ````
 We are importing an extremely simple table, so our table command reflect only three columns. While we don't need population density (population / sq miles), it is interesting to have in our back pocket.
+
+### California Counties by Population
+![California County Data](https://github.com/benstackler/County-Research/blob/benstackler-images/Screen%20Shot%202025-11-18%20at%203.32.30%20PM.png)
 
 ## Joining Both Tables and Sorting by WIC Usage Rate
 
@@ -58,3 +67,7 @@ from wic left join cali on wic.county_of_residence = cali.county
 where wic.county_of_residence <> 'Statewide' and year_month = 2024
 group by wic.county_of_residence, cali.population order by rate desc;
 ````
+### California Counties by WIC Usage Rate (Ascending)
+![Ascending WIC Usage](https://github.com/benstackler/County-Research/blob/benstackler-images/Screen%20Shot%202025-11-18%20at%203.35.58%20PM.png)
+### California Counties by WIC Usage Rate (Descending)
+![Descending WIC Usage](https://github.com/benstackler/County-Research/blob/benstackler-images/Screen%20Shot%202025-11-18%20at%203.35.58%20PM.png)
