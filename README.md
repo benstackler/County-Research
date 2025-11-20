@@ -1,84 +1,26 @@
-# :baby_bottle: Calculating the California Counties with the Highest WIC Usage per Capita
+# 🏠: Comparing County Property Taxes and Real Estate Values
 
-What if we want to calcualte the California counties with the **highest WIC rate** (calculated as WIC participants divided by total county population)? We would need some way to combine county population estimates with WIC participant estimates, all grouped by county. 
+What if we want to calculate effective tax rate using property taxes and hom values, sorted by state?
 
-Luckily, we have access to the [California Open Data Portal](https://data.ca.gov/dataset/wic-participants-by-county), which contains information on 2024 WIC usage by county. Similarly, [World Population Review](https://worldpopulationreview.com/us-counties/california) contains 2025 California county populations (straight from U.S. Census). 
+**Source:** [Tax Foundation County Tax Data](https://taxfoundation.org/data/all/state/property-taxes-by-state-county/)
 
-After cleaning data in both CSV files we are ready to begin our SQL Work.
-
-## Creating WIC Table
+## Creating Property Tax and Real Estate Value Table
 
 ````sql
-create table WIC(county_code int, county_of_residence text,
-year_month text, race text, participants int);
+create table county_tax(state text, county text,
+house_value integer, property_tax integer);
 ````
-Importantly, we want to ensure that our WIC table variable are correct before importing the WIC data. I imported year_month as text because we already have aggregated year rows, so we don't actually need to convert it to a date format (saving us time). The rest of the columns can be formatted in either integer or text format.
 
-### Raw WIC Data
+### Raw County Data
 ![raw](https://github.com/benstackler/County-Research/blob/benstackler-images/Screen%20Shot%202025-11-18%20at%203.31.43%20PM.png)
 
-However, we quickly notice that **some of our participant data is null** for certain rows. This is because the table is broken down by race/ethncitiy and certain counties have 0 participants classified as a certain race/ethnicity. We fix this by updating the table to convert null values to 0.
+Home values and property taxes are grouped by county and state, but what if we want to calculate the effective tax rate and order from highest to lowest? 
 
 ````sql
-UPDATE WIC
-SET participants = 0
-WHERE participants IS NULL;
+select state, county, CAST(COALESCE(property_tax, 0) as DECIMAL) / NULLIF(house_value, 0) * 100 as tax_rate from county_tax
+WHERE property_tax <> 0 AND house_value <> 0
+order by CAST(COALESCE(property_tax, 0) as DECIMAL) / NULLIF(house_value, 0) * 100 asc;
 ````
-This will ensure that any rows lacking participant data are displayed as '0' instead of null.
+There are several things that need to be accounted for here. Firstly, we need to use the CAST function on our integer variables to convert them to decimals in order to ensure that our division function reflects its actual quotient. However, we also need to use the COALESCE function to convert null values to 0 (in case any property tax valuesare listed as nulls). In our denominator, we have to convert any 0 values to null (so we do not divide by zero).
 
-### Sorting WIC Table by Year 2024 and County of Residence
-
-````sql
-select county_of_residence, sum(participants) as total from WIC where 
-county_of_residence <> 'Statewide' and year_month = 2024
-group by county_of_residence order by total desc;
-````
-Here we are ensuring that we're **only querying for 2024 data**, and that we're excluding rows where the counties are combined into a nationwide measurement. We want to **sum participants** so that all race metrics are summed, and we **group at the county level** to ensure that our results are listed by county. 
-
-### California Counties WIC Usage
-![WIC Usage](https://github.com/benstackler/County-Research/blob/benstackler-images/Screen%20Shot%202025-11-18%20at%203.32.08%20PM.png)
-
-Unsuprisingly, Los Angeles has the **total most WIC participants** (as it has the highest total population of any county). But this begs the question: Which county has the **highest WIC usage ratio per capita**? Los Angeles' ratio could be expected to be lower than other counties because it has such a large population, and includes certain neighborhoods which are among the wealthiest in the nation.
-
-To find out, we must incorporate **total county population data.**
-
-## Creating California County Population Table
-
-````sql
-create table cali(population int, density int, county text);
-````
-We are importing an extremely simple table, so our table command reflect only three columns. While we don't need population density (population / sq miles), it is interesting to have in our back pocket.
-
-### California Counties by Population
-![California County Data](https://github.com/benstackler/County-Research/blob/benstackler-images/Screen%20Shot%202025-11-18%20at%203.32.30%20PM.png)
-
-## Joining Both Tables and Sorting by WIC Usage Rate
-
-Our question primarily involves WIC data, so we will **use the WIC table as our primary table**. We are doing a **left join** on the California County Population table, using county name as the join key. 
-
-However, we still want to display our aggregate participant values, so we include a **sum(participants)** aggregate function within the 'Select' command. We have to incorporate a 'group by' command now that we've used an aggregate command, so we will first be **grouping by county**. Then we want to have **county population** as a point of comparison, so we will include that as our second 'group by' column. 
-
-Finally, we want our **per capita WIC usage rate**, (defined as WIC participants / county population), so we include a CAST function to ensure that when we divide our two integer columns, we get the corresponding ratio, and not a result of '0.'
-
-````sql
-select wic.county_of_residence, sum(wic.participants) as total, cali.population, 
-CAST(sum(wic.participants) as DECIMAL) / cali.population * 100 as rate
-from wic left join cali on wic.county_of_residence = cali.county
-where wic.county_of_residence <> 'Statewide' and year_month = 2024
-group by wic.county_of_residence, cali.population order by rate desc;
-````
-### California Counties by WIC Usage Rate (Ascending)
-![Ascending WIC Usage](https://github.com/benstackler/County-Research/blob/benstackler-images/Screen%20Shot%202025-11-18%20at%203.35.58%20PM.png)
-
-We see that Merced County, Madera County, and Fresno County **lead the state in WIC Usage Rate** (all hovering around 5% of total county population).
-
-### California Counties by WIC Usage Rate (Descending)
-![Descending WIC Usage](https://github.com/benstackler/County-Research/blob/benstackler-images/Screen%20Shot%202025-11-18%20at%203.35.39%20PM.png)
-
-Placer County and El Dorado County have the **lowest WIC Usage Rate**, at less than 1% of county population.
-
-# Exporting Data to Tableau
-What if we want to visualize the data in Tableau? Well, we can export it as a CSV file and import into Tableau directly. We just have to ensure that we specify that the counties in our column are listed as California counties, specifically. Then we can use Tableau's color function to **shade the counties by WIC Usage Rate.**
-
-### Visualizing WIC Usage Rate by County
-![tableau](https://github.com/benstackler/County-Research/blob/benstackler-images/CA%20County%20Tableau.png)
+We also add in a WHERE function to avoid returning null results (rows with 0 values or null values for both property tax and house value). We then want to order by new county_tax column.
