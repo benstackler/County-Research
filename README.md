@@ -69,5 +69,10 @@ group by wic.county_of_residence, cali.population order by rate desc;
 ````
 ### California Counties by WIC Usage Rate (Ascending)
 ![Ascending WIC Usage](https://github.com/benstackler/County-Research/blob/benstackler-images/Screen%20Shot%202025-11-18%20at%203.35.58%20PM.png)
+
+We see that Merced County, Madera County, and Fresno County lead the state in WIC Usage Rate (all hovering around 5% of total county population).
+
 ### California Counties by WIC Usage Rate (Descending)
 ![Descending WIC Usage](https://github.com/benstackler/County-Research/blob/benstackler-images/Screen%20Shot%202025-11-18%20at%203.35.58%20PM.png)
+
+Placer County and El Dorado County have the lowest WIC Usage Rate, at less than 1% of county population.
