@@ -70,9 +70,15 @@ group by wic.county_of_residence, cali.population order by rate desc;
 ### California Counties by WIC Usage Rate (Ascending)
 ![Ascending WIC Usage](https://github.com/benstackler/County-Research/blob/benstackler-images/Screen%20Shot%202025-11-18%20at%203.35.58%20PM.png)
 
-We see that Merced County, Madera County, and Fresno County lead the state in WIC Usage Rate (all hovering around 5% of total county population).
+We see that Merced County, Madera County, and Fresno County **lead the state in WIC Usage Rate** (all hovering around 5% of total county population).
 
 ### California Counties by WIC Usage Rate (Descending)
-![Descending WIC Usage](https://github.com/benstackler/County-Research/blob/benstackler-images/Screen%20Shot%202025-11-18%20at%203.35.58%20PM.png)
+![Descending WIC Usage](https://github.com/benstackler/County-Research/blob/benstackler-images/Screen%20Shot%202025-11-18%20at%203.35.39%20PM.png)
 
-Placer County and El Dorado County have the lowest WIC Usage Rate, at less than 1% of county population.
+Placer County and El Dorado County have the **lowest WIC Usage Rate**, at less than 1% of county population.
+
+# Exporting Data to Tableau
+What if we want to visualize the data in Tableau? Well, we can export it as a CSV file and import into Tableau directly. We just have to ensure that we specify that the counties in our column are listed as California counties, specifically. Then we can use Tableau's color function to **shade the counties by WIC Usage Rate.**
+
+### Visualizing WIC Usage Rate by County
+![tableau](https://github.com/benstackler/County-Research/blob/benstackler-images/CA%20County%20Tableau.png)
