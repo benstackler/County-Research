@@ -1,4 +1,4 @@
-# 🏠: Comparing County Property Taxes and Real Estate Values
+# 🏠 Comparing County Property Taxes and Real Estate Values
 
 What if we want to calculate effective tax rate using property taxes and hom values, sorted by state?
 
