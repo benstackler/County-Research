@@ -54,4 +54,4 @@ Creating a new view means that we were able to utilize a pretty simple query to 
 ![asc](https://github.com/benstackler/County-Research/blob/benstackler-images3/Screen%20Shot%202025-11-21%20at%208.50.26%20AM.png)
 
 ### Tableau Visual: States by Average County Property Tax Rate
-![tableau](https://github.com/benstackler/County-Research/tree/benstackler-images3)
+![tableau](https://github.com/benstackler/County-Research/blob/benstackler-images3/Screen%20Shot%202025-11-21%20at%209.01.46%20AM.png)
